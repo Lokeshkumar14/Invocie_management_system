@@ -1,10 +1,34 @@
+import base64
+import binascii
 import io
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether
+from reportlab.lib.utils import ImageReader
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from app.models import models
+
+
+def get_company_logo(logo: str | None):
+    """Return a scaled logo flowable, or None when no valid image was saved."""
+    if not logo:
+        return None
+
+    try:
+        image_data = logo.split(",", 1)[1] if logo.startswith("data:image/") else logo
+        image_stream = io.BytesIO(base64.b64decode(image_data, validate=True))
+        width, height = ImageReader(image_stream).getSize()
+        if width <= 0 or height <= 0:
+            return None
+
+        max_width, max_height = 70, 55
+        scale = min(max_width / width, max_height / height)
+        image_stream.seek(0)
+        return Image(image_stream, width=width * scale, height=height * scale)
+    except (ValueError, binascii.Error, OSError):
+        return None
+
 
 def generate_invoice_pdf(invoice: models.Invoice, company: models.CompanyDetails) -> io.BytesIO:
     buffer = io.BytesIO()
@@ -96,12 +120,25 @@ def generate_invoice_pdf(invoice: models.Invoice, company: models.CompanyDetails
     company_gst = company.gst if company else "24AAAAA0000A1Z5"
     company_pan = company.pan if company else "ABCDE1234F"
 
-    header_left = [
+    company_info = [
         Paragraph(company_name, title_style),
         Spacer(1, 4),
         Paragraph(f"<b>Address:</b> {company_address}", normal_text),
         Paragraph(f"<b>GSTIN:</b> {company_gst} | <b>PAN:</b> {company_pan}", normal_text)
     ]
+
+    logo = get_company_logo(company.logo if company else None)
+    header_left = company_info if not logo else Table(
+        [[logo, company_info]],
+        colWidths=[80, 240],
+        style=[
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ],
+    )
     
     header_right = [
         Paragraph("TAX INVOICE", ParagraphStyle('TaxInvoice', parent=title_style, alignment=2, fontSize=22, textColor=colors.HexColor('#2B6CB0'))),

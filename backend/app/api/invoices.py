@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.database.session import get_db
@@ -184,7 +184,16 @@ def delete_invoice(
     db.commit()
     return {"detail": "Invoice deleted successfully"}
 
-@router.get("/{invoice_id}/pdf")
+@router.get(
+    "/{invoice_id}/pdf",
+    response_class=Response,
+    responses={
+        200: {
+            "content": {"application/pdf": {}},
+            "description": "Invoice PDF",
+        }
+    },
+)
 def get_pdf(
     invoice_id: int,
     db: Session = Depends(get_db),
@@ -199,8 +208,13 @@ def get_pdf(
     
     filename = f"Invoice_{invoice.invoice_number}.pdf"
     
-    return StreamingResponse(
-        pdf_buffer,
+    pdf_content = pdf_buffer.getvalue()
+
+    return Response(
+        content=pdf_content,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_content)),
+        },
     )

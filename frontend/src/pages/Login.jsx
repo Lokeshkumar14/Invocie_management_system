@@ -157,13 +157,9 @@ const Login = () => {
             </Button>
           </form>
 
-          <Box sx={{ mt: 3, p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px dashed #e2e8f0', textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">
-              Demo Admin Credentials:
-              <br />
-              <b>Username:</b> admin | <b>Password:</b> admin123
-            </Typography>
-          </Box>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 3, textAlign: 'center' }}>
+            Sign in with the administrator credentials configured for this environment.
+          </Typography>
         </CardContent>
       </Card>
     </Box>

@@ -1,4 +1,5 @@
 import os
+import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import Depends, HTTPException, status
@@ -14,7 +15,11 @@ from app.schemas import schemas
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 # Settings
-SECRET_KEY = os.getenv("SECRET_KEY", "949f25010b953d6ebefcd42be81bdf96bf65f24209c15814bfb229712a4bb4b5")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    # Safe for tests and ephemeral local runs. Set SECRET_KEY explicitly for
+    # every deployed environment so tokens survive restarts.
+    SECRET_KEY = secrets.token_urlsafe(48)
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 

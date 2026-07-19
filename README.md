@@ -18,7 +18,7 @@ A full-stack application for managing customers, products, GST-ready invoices, s
 | --- | --- |
 | Frontend | React 18, Vite, Material UI, Axios, React Hook Form, Recharts |
 | Backend | FastAPI, SQLAlchemy, Pydantic |
-| Database | SQLite by default; PostgreSQL is supported through `DATABASE_URL` |
+| Database | PostgreSQL for deployment; SQLite is available only for local development |
 | Authentication | JWT with bcrypt password hashing |
 | PDF generation | ReportLab |
 
@@ -64,14 +64,16 @@ py -m venv venv
 pip install -r requirements.txt
 ```
 
-Create `backend/.env` from the following example. `DATABASE_URL` may point to SQLite or PostgreSQL.
+Copy `backend/.env.example` to `backend/.env` and set the values. For local development, `DATABASE_URL=sqlite:///./invoice.db` is supported. For deployment, use the PostgreSQL URL supplied by Supabase or another managed PostgreSQL provider.
 
 ```env
-DATABASE_URL=sqlite:///./invoice.db
-SECRET_KEY=replace-with-a-long-random-secret
+DATABASE_URL=postgresql+psycopg2://postgres:password@db.example.supabase.co:5432/postgres
+SECRET_KEY=generate-a-long-random-value
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
-DEFAULT_COMPANY_STATE=Tamilnadu
+INITIAL_ADMIN_USERNAME=invoice_admin
+INITIAL_ADMIN_PASSWORD=choose-a-strong-password
+CORS_ORIGINS=https://your-project.pages.dev
 ```
 
 Start the API:
@@ -82,14 +84,7 @@ uvicorn app.main:app --reload
 
 The API runs at `http://localhost:8000`. Interactive API documentation is available at `http://localhost:8000/docs`.
 
-On the first startup, the backend creates an admin account:
-
-```text
-Username: admin
-Password: admin123
-```
-
-Change this password and the `SECRET_KEY` before using the application outside local development.
+On first startup, the backend creates the administrator configured through `INITIAL_ADMIN_USERNAME` and `INITIAL_ADMIN_PASSWORD`. It does not contain a hard-coded default password.
 
 ### 2. Frontend
 
@@ -103,7 +98,7 @@ npm run dev
 
 Open the URL shown by Vite, normally `http://localhost:5173`.
 
-By default the frontend connects to `http://localhost:8000/api`. To use a different API address, create `frontend/.env.local`:
+By default the frontend connects to `http://localhost:8000/api`. To use a different API address, create `frontend/.env.local`. In Cloudflare Pages, add the same variable in **Settings → Environment variables** before building:
 
 ```env
 VITE_API_URL=http://localhost:8000/api
@@ -159,4 +154,4 @@ pytest
 
 - Never commit `.env`, database files, or real secrets.
 - Configure explicit allowed CORS origins before deploying.
-- Replace the seeded default credentials in any shared or production environment.
+- Set unique `INITIAL_ADMIN_USERNAME` and `INITIAL_ADMIN_PASSWORD` values for every shared or production environment.

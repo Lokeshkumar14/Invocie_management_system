@@ -88,9 +88,9 @@ const Dashboard = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Welcome Banner / Action */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: { xs: 2.5, sm: 4 } }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: { xs: '1.55rem', sm: '2.125rem' }, mb: 0.5 }}>
             Dashboard Overview
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -101,7 +101,7 @@ const Dashboard = () => {
           variant="contained"
           startIcon={<AddCircleOutline />}
           onClick={() => navigate('/invoice/create')}
-          sx={{ background: 'linear-gradient(45deg, #2563eb, #0d9488)' }}
+          sx={{ background: 'linear-gradient(45deg, #2563eb, #0d9488)', width: { xs: '100%', sm: 'auto' } }}
         >
           Create New Invoice
         </Button>
@@ -149,7 +149,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 Sales Trend (Past 30 Days)
               </Typography>
-              <Box sx={{ width: '100%', height: 300 }}>
+              <Box sx={{ width: '100%', height: { xs: 230, sm: 300 } }}>
                 {trend.length === 0 ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                     <Typography color="text.secondary">No sales recorded in the past 30 days.</Typography>
@@ -183,7 +183,7 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 Monthly Comparison
               </Typography>
-              <Box sx={{ width: '100%', height: 300 }}>
+              <Box sx={{ width: '100%', height: { xs: 230, sm: 300 } }}>
                 {monthly.length === 0 ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                     <Typography color="text.secondary">No monthly details available.</Typography>

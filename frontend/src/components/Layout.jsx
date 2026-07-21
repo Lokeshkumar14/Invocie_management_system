@@ -158,7 +158,7 @@ const Layout = () => {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1.5, sm: 3 }, minHeight: { xs: 56, sm: 64 } }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -169,18 +169,18 @@ const Layout = () => {
             <MenuIcon />
           </IconButton>
           
-          <Typography variant="h6" component="div" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>
+          <Typography variant="h6" component="div" noWrap sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600, fontSize: { xs: '1rem', sm: '1.1rem' }, minWidth: 0 }}>
             {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, sm: 2 }, ml: 1 }}>
             <Button
               color="inherit"
               startIcon={<AccountCircle />}
               onClick={handleMenuOpen}
-              sx={{ fontWeight: 500 }}
+              sx={{ fontWeight: 500, minWidth: { xs: 40, sm: 'auto' }, px: { xs: 0.5, sm: 1 } }}
             >
-              {username}
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{username}</Box>
             </Button>
             <Menu
               anchorEl={anchorEl}
@@ -236,10 +236,11 @@ const Layout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 1.5, sm: 3 },
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: 8,
-          overflowX: 'auto'
+          mt: { xs: 7, sm: 8 },
+          minWidth: 0,
+          overflowX: 'hidden'
         }}
       >
         <Outlet />

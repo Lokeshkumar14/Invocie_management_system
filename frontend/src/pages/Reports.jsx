@@ -108,9 +108,9 @@ const Reports = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: { xs: 2.5, sm: 4 } }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: { xs: '1.55rem', sm: '2.125rem' }, mb: 0.5 }}>
             GST & Sales Reports
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -121,8 +121,9 @@ const Reports = () => {
           variant="contained"
           color="secondary"
           startIcon={<FileDownload />}
-          onClick={handleExportCSV}
-          disabled={csvDownloading}
+        onClick={handleExportCSV}
+        disabled={csvDownloading}
+        sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           {csvDownloading ? 'Exporting...' : 'Export CSV Report'}
         </Button>
@@ -135,6 +136,9 @@ const Reports = () => {
         sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}
         textColor="primary"
         indicatorColor="primary"
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
       >
         <Tab icon={<ReceiptLong fontSize="small" />} iconPosition="start" label="GST Sales Ledger" />
         <Tab icon={<PersonPin fontSize="small" />} iconPosition="start" label="Customer-wise Sales" />
@@ -143,8 +147,8 @@ const Reports = () => {
 
       {/* Tab Panel 1: GST Sales Ledger */}
       {tabIndex === 0 && (
-        <TableContainer component={Paper}>
-          <Table>
+        <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
+          <Table sx={{ minWidth: 900 }}>
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600 }}>Invoice No</TableCell>
@@ -195,7 +199,7 @@ const Reports = () => {
 
       {/* Tab Panel 2: Customer-wise Sales */}
       {tabIndex === 1 && (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
           <Table>
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>
@@ -229,7 +233,7 @@ const Reports = () => {
 
       {/* Tab Panel 3: Product Performance */}
       {tabIndex === 2 && (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
           <Table>
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>

@@ -104,9 +104,9 @@ const InvoiceHistory = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mb: { xs: 2.5, sm: 4 } }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: { xs: '1.55rem', sm: '2.125rem' }, mb: 0.5 }}>
             Invoice History
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -120,7 +120,7 @@ const InvoiceHistory = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
           <Table sx={{ minWidth: 650 }}>
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>

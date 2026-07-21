@@ -69,9 +69,9 @@ const Settings = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mb: { xs: 2.5, sm: 4 } }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: { xs: '1.55rem', sm: '2.125rem' }, mb: 0.5 }}>
             System Settings
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -85,7 +85,7 @@ const Settings = () => {
           {/* Company Details Form */}
           <Grid item xs={12} md={6}>
             <Card sx={{ height: '100%' }}>
-              <CardContent>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                   <Business color="primary" />
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>Enterprise Branding</Typography>
@@ -143,7 +143,7 @@ const Settings = () => {
           {/* Bank & Remittance details */}
           <Grid item xs={12} md={6}>
             <Card sx={{ height: '100%' }}>
-              <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: { xs: 2, sm: 3 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                   <AccountBalance color="primary" />
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>Bank Remittance Info</Typography>
@@ -197,7 +197,7 @@ const Settings = () => {
                     variant="contained"
                     startIcon={<Save />}
                     disabled={saving}
-                    sx={{ px: 4 }}
+                    sx={{ px: 4, width: { xs: '100%', sm: 'auto' } }}
                   >
                     {saving ? 'Saving...' : 'Save Settings'}
                   </Button>

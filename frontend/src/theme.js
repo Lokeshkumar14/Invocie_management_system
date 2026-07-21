@@ -112,6 +112,23 @@ const theme = createTheme({
         },
       },
     },
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          maxWidth: '100%',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          margin: 12,
+          width: 'calc(100% - 24px)',
+        },
+      },
+    },
   },
 });
 

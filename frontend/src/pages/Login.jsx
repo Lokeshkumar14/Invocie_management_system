@@ -67,11 +67,11 @@ const Login = () => {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #ccfbf1 100%)',
-        p: 2
+        p: { xs: 1.5, sm: 2 }
       }}
     >
-      <Card sx={{ maxWidth: 420, width: '100%', borderRadius: 4 }}>
-        <CardContent sx={{ p: 4 }}>
+      <Card sx={{ maxWidth: 420, width: '100%', borderRadius: { xs: 3, sm: 4 } }}>
+        <CardContent sx={{ p: { xs: 2.5, sm: 4 } }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Typography
               variant="h4"
@@ -81,6 +81,7 @@ const Login = () => {
                 background: 'linear-gradient(45deg, #2563eb, #0d9488)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                fontSize: { xs: '1.75rem', sm: '2.125rem' },
                 mb: 1
               }}
             >

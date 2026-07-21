@@ -157,9 +157,9 @@ const Customers = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: { xs: 2.5, sm: 4 } }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: { xs: '1.55rem', sm: '2.125rem' }, mb: 0.5 }}>
             Customers List
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -170,7 +170,7 @@ const Customers = () => {
           variant="contained"
           startIcon={<Add />}
           onClick={() => handleOpenDialog()}
-          sx={{ background: 'linear-gradient(45deg, #2563eb, #0d9488)' }}
+          sx={{ background: 'linear-gradient(45deg, #2563eb, #0d9488)', width: { xs: '100%', sm: 'auto' } }}
         >
           Add Customer
         </Button>
@@ -201,7 +201,7 @@ const Customers = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>

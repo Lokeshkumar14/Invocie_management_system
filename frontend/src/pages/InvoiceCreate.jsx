@@ -231,9 +231,9 @@ const InvoiceCreate = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mb: { xs: 2.5, sm: 4 } }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: { xs: '1.55rem', sm: '2.125rem' }, mb: 0.5 }}>
             {isJobWork ? 'Create Job Work Invoice' : 'Create GST Invoice'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -248,7 +248,7 @@ const InvoiceCreate = () => {
         {/* Left Side - Invoice Inputs */}
         <Grid item xs={12} lg={8}>
           <Card sx={{ mb: 3 }}>
-            <CardContent>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Invoice Header</Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
@@ -345,8 +345,8 @@ const InvoiceCreate = () => {
 
           {/* Items Section */}
           <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 3 } }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>{isJobWork ? 'Job Charges' : 'Items & Rates'}</Typography>
                 <Button 
                   variant="outlined" 
@@ -358,8 +358,8 @@ const InvoiceCreate = () => {
                 </Button>
               </Box>
 
-              <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #f1f5f9' }}>
-                <Table size="small">
+              <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #f1f5f9', maxWidth: '100%' }}>
+                <Table size="small" sx={{ minWidth: isJobWork ? 900 : 760 }} aria-label="Invoice items. Scroll sideways on small screens to see all columns.">
                   <TableHead sx={{ bgcolor: '#f8fafc' }}>
                     <TableRow>
                       {isJobWork && <TableCell sx={{ fontWeight: 600 }}>DC No.</TableCell>}
@@ -443,8 +443,8 @@ const InvoiceCreate = () => {
 
         {/* Right Side - Invoice Preview & Tallies Summary */}
         <Grid item xs={12} lg={4}>
-          <Card sx={{ position: 'sticky', top: 96, mb: 3 }}>
-            <CardContent>
+          <Card sx={{ position: { xs: 'static', lg: 'sticky' }, top: 96, mb: 3 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Billing Summary</Typography>
               
               {/* Customer Details Display */}
@@ -519,7 +519,7 @@ const InvoiceCreate = () => {
                 sx={{ mt: 3 }}
               />
 
-              <Box sx={{ display: 'flex', gap: 2, mt: 4 }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, mt: 4 }}>
                 <Button
                   variant="contained"
                   fullWidth

@@ -121,6 +121,10 @@ class InvoiceItemBase(BaseModel):
     product_id: int
     quantity: float
     rate: float
+    dc_number: Optional[str] = None
+    dc_date: Optional[date] = None
+    dia: Optional[str] = None
+    rolls: Optional[float] = None
 
 class InvoiceItemCreate(InvoiceItemBase):
     pass
@@ -131,6 +135,10 @@ class InvoiceItemResponse(BaseModel):
     product_id: int
     quantity: float
     rate: float
+    dc_number: Optional[str] = None
+    dc_date: Optional[date] = None
+    dia: Optional[str] = None
+    rolls: Optional[float] = None
     gst: float
     amount: float
     product: Optional[ProductResponse] = None
@@ -143,9 +151,13 @@ class InvoiceBase(BaseModel):
     invoice_number: str
     invoice_date: date
     customer_id: int
+    invoice_type: str = "tax_invoice"
     transport: Optional[str] = None
     sale_order: Optional[str] = None
     payment_terms: Optional[str] = None
+    challan_number: Optional[str] = None
+    job_work_reference: Optional[str] = None
+    job_work_description: Optional[str] = None
     remarks: Optional[str] = None
     status: Optional[str] = "unpaid"
 
@@ -158,6 +170,7 @@ class InvoiceResponse(InvoiceBase):
     cgst: float
     sgst: float
     igst: float
+    round_off: float
     grand_total: float
     amount_words: str
     created_at: datetime

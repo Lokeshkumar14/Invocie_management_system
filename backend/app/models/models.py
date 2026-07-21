@@ -66,17 +66,24 @@ class Invoice(Base):
     invoice_number = Column(String, unique=True, index=True, nullable=False)
     invoice_date = Column(Date, nullable=False)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
+    # `tax_invoice` is the normal sales invoice; `job_work` is for processing
+    # charges billed against material supplied by the customer.
+    invoice_type = Column(String, nullable=False, default="tax_invoice")
     
     # Extra header fields
     transport = Column(String)
     sale_order = Column(String)
     payment_terms = Column(String)
+    challan_number = Column(String)
+    job_work_reference = Column(String)
+    job_work_description = Column(Text)
     
     # Financial fields
     subtotal = Column(Float, default=0.0)
     cgst = Column(Float, default=0.0)
     sgst = Column(Float, default=0.0)
     igst = Column(Float, default=0.0)
+    round_off = Column(Float, default=0.0)
     grand_total = Column(Float, default=0.0)
     amount_words = Column(String)
     remarks = Column(Text)
@@ -95,6 +102,10 @@ class InvoiceItem(Base):
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     quantity = Column(Float, nullable=False)
     rate = Column(Float, nullable=False)
+    dc_number = Column(String)
+    dc_date = Column(Date)
+    dia = Column(String)
+    rolls = Column(Float)
     gst = Column(Float, default=0.0)      # GST amount for this item
     amount = Column(Float, nullable=False)   # Total amount for this item (excluding tax or including? usually subtotal, let's store quantity * rate)
 

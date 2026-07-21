@@ -142,7 +142,7 @@ const Products = () => {
             Product Catalog
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage fabric and yarn materials, colors, unit rules, prices, and HSN/GST configurations.
+            Manage materials and job-work services with their unit, price, HSN, and GST configuration.
           </Typography>
         </Box>
         <Button
@@ -250,7 +250,7 @@ const Products = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="Product / Material Name"
+                  label="Product / Service Name"
                   fullWidth
                   required
                   {...register('product_name', { required: 'Product name is required' })}

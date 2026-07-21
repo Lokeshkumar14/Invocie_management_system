@@ -184,3 +184,41 @@ def test_gst_engine_different_state(client):
     assert inv_data["sgst"] == 0.0
     assert inv_data["igst"] == 500.0
     assert inv_data["grand_total"] == 10500.0
+
+
+def test_job_work_invoice_fields_and_pdf_title(client):
+    login_response = client.post("/api/auth/login", data={"username": "testadmin", "password": "admin123"})
+    headers = {"Authorization": f"Bearer {login_response.json()['access_token']}"}
+
+    customer = client.post("/api/customers", json={
+        "company_name": "Job Work Client",
+        "state": "Maharashtra",
+    }, headers=headers).json()
+    product = client.post("/api/products", json={
+        "product_name": "Dyeing Charges",
+        "gst_percentage": 5.0,
+        "price": 20.0,
+        "unit": "Kgs",
+    }, headers=headers).json()
+
+    response = client.post("/api/invoice", json={
+        "invoice_number": "JWI-TEST-001",
+        "invoice_date": "2026-07-21",
+        "invoice_type": "job_work",
+        "customer_id": customer["id"],
+        "challan_number": "CH-101",
+        "job_work_reference": "JW-45",
+        "job_work_description": "Dyeing charges for customer supplied fabric",
+        "items": [{"product_id": product["id"], "quantity": 100, "rate": 20}],
+    }, headers=headers)
+
+    assert response.status_code == 201
+    invoice = response.json()
+    assert invoice["invoice_type"] == "job_work"
+    assert invoice["challan_number"] == "CH-101"
+    assert invoice["job_work_reference"] == "JW-45"
+
+    pdf_response = client.get(f"/api/invoice/{invoice['id']}/pdf", headers=headers)
+    assert pdf_response.status_code == 200
+    assert pdf_response.headers["content-type"].startswith("application/pdf")
+    assert pdf_response.content.startswith(b"%PDF")

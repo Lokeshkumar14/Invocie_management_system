@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
+from decimal import Decimal, ROUND_HALF_UP
 from app.database.session import get_db
 from app.models import models
 from app.schemas import schemas
@@ -59,6 +60,10 @@ def create_invoice(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(security.get_current_user)
 ):
+    invoice_type = (invoice_data.invoice_type or "tax_invoice").lower()
+    if invoice_type not in {"tax_invoice", "job_work"}:
+        raise HTTPException(status_code=422, detail="Invoice type must be tax_invoice or job_work")
+
     # 1. Fetch Customer
     customer = db.query(models.Customer).filter(models.Customer.id == invoice_data.customer_id).first()
     if not customer:
@@ -82,7 +87,8 @@ def create_invoice(
         # Find latest invoice to increment number
         latest_inv = db.query(models.Invoice).order_by(desc(models.Invoice.id)).first()
         next_id = (latest_inv.id + 1) if latest_inv else 1
-        invoice_num = f"INV-2026-{next_id:04d}"
+        prefix = "JWI" if invoice_type == "job_work" else "INV"
+        invoice_num = f"{prefix}-{invoice_data.invoice_date.year}-{next_id:04d}"
 
     # Verify invoice number is unique
     existing_inv = db.query(models.Invoice).filter(models.Invoice.invoice_number == invoice_num).first()
@@ -94,15 +100,20 @@ def create_invoice(
         invoice_number=invoice_num,
         invoice_date=invoice_data.invoice_date,
         customer_id=invoice_data.customer_id,
+        invoice_type=invoice_type,
         transport=invoice_data.transport,
         sale_order=invoice_data.sale_order,
         payment_terms=invoice_data.payment_terms,
+        challan_number=invoice_data.challan_number,
+        job_work_reference=invoice_data.job_work_reference,
+        job_work_description=invoice_data.job_work_description,
         remarks=invoice_data.remarks,
         status=invoice_data.status or "unpaid",
         subtotal=0.0,
         cgst=0.0,
         sgst=0.0,
         igst=0.0,
+        round_off=0.0,
         grand_total=0.0,
         amount_words=""
     )
@@ -137,6 +148,10 @@ def create_invoice(
             product_id=item_data.product_id,
             quantity=qty,
             rate=rate,
+            dc_number=item_data.dc_number,
+            dc_date=item_data.dc_date,
+            dia=item_data.dia,
+            rolls=item_data.rolls,
             gst=item_gst,
             amount=basic_amount
         )
@@ -155,7 +170,11 @@ def create_invoice(
         sgst = 0.0
         igst = total_gst
 
-    grand_total = subtotal + cgst + sgst + igst
+    taxable_total = subtotal + cgst + sgst + igst
+    # Indian invoices conventionally round the payable amount to the nearest rupee.
+    # ROUND_HALF_UP avoids Python's banker's rounding at exactly 50 paise.
+    grand_total = float(Decimal(str(taxable_total)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    round_off = grand_total - taxable_total
     amount_words = num_to_words(grand_total)
 
     # Update Invoice tallies
@@ -163,7 +182,8 @@ def create_invoice(
     db_invoice.cgst = round(cgst, 2)
     db_invoice.sgst = round(sgst, 2)
     db_invoice.igst = round(igst, 2)
-    db_invoice.grand_total = round(grand_total, 2)
+    db_invoice.round_off = round(round_off, 2)
+    db_invoice.grand_total = grand_total
     db_invoice.amount_words = amount_words
 
     db.commit()

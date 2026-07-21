@@ -125,6 +125,7 @@ const InvoiceHistory = () => {
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600 }}>Invoice No</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Customer Name</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>Subtotal (INR)</TableCell>
@@ -137,7 +138,7 @@ const InvoiceHistory = () => {
             <TableBody>
               {invoices.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 4, color: 'text.secondary' }}>
                     No invoice transactions found. Create your first invoice!
                   </TableCell>
                 </TableRow>
@@ -147,6 +148,7 @@ const InvoiceHistory = () => {
                   return (
                     <TableRow key={inv.id} hover>
                       <TableCell sx={{ fontWeight: 600 }}>{inv.invoice_number}</TableCell>
+                      <TableCell>{inv.invoice_type === 'job_work' ? 'Job Work' : 'Tax Invoice'}</TableCell>
                       <TableCell>
                         {new Date(inv.invoice_date).toLocaleDateString('en-IN', {
                           day: '2-digit',

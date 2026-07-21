@@ -6,13 +6,14 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database.session import engine, Base, SessionLocal
+from app.database.session import engine, Base, SessionLocal, add_missing_invoice_columns
 from app.models import models
 from app.auth import security
 from app.api import auth, customers, products, invoices, reports, settings
 
 # Ensure database tables exist
 Base.metadata.create_all(bind=engine)
+add_missing_invoice_columns()
 
 # Seed the initial administrator only when credentials are supplied through the
 # environment. There are intentionally no hard-coded production credentials.

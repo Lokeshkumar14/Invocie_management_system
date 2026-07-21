@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -44,11 +44,14 @@ const InvoiceCreate = () => {
   const [transport, setTransport] = useState('');
   const [saleOrder, setSaleOrder] = useState('');
   const [paymentTerms, setPaymentTerms] = useState('Net 30');
+  const [challanNumber, setChallanNumber] = useState('');
+  const [jobWorkReference, setJobWorkReference] = useState('');
+  const [jobWorkDescription, setJobWorkDescription] = useState('');
   const [remarks, setRemarks] = useState('');
   
   // Invoiced line items
   const [items, setItems] = useState([
-    { product_id: '', quantity: 1, rate: 0, hsn: '', color: '', gst_percentage: 0, amount: 0, gst_amount: 0 }
+    { product_id: '', quantity: 1, rate: 0, hsn: '', color: '', gst_percentage: 0, amount: 0, gst_amount: 0, dc_number: '', dc_date: '', dia: '', rolls: '' }
   ]);
 
   // Loading & alerts
@@ -57,6 +60,8 @@ const InvoiceCreate = () => {
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const isJobWork = location.pathname === '/invoice/job-work';
 
   useEffect(() => {
     const loadMetadata = async () => {
@@ -92,7 +97,7 @@ const InvoiceCreate = () => {
   const handleAddRow = () => {
     setItems([
       ...items,
-      { product_id: '', quantity: 1, rate: 0, hsn: '', color: '', gst_percentage: 0, amount: 0, gst_amount: 0 }
+      { product_id: '', quantity: 1, rate: 0, hsn: '', color: '', gst_percentage: 0, amount: 0, gst_amount: 0, dc_number: '', dc_date: '', dia: '', rolls: '' }
     ]);
   };
 
@@ -187,12 +192,20 @@ const InvoiceCreate = () => {
         transport,
         sale_order: saleOrder,
         payment_terms: paymentTerms,
+        invoice_type: isJobWork ? 'job_work' : 'tax_invoice',
+        challan_number: challanNumber,
+        job_work_reference: jobWorkReference,
+        job_work_description: jobWorkDescription,
         remarks,
         status: 'unpaid',
         items: validItems.map(item => ({
           product_id: parseInt(item.product_id),
           quantity: parseFloat(item.quantity),
-          rate: parseFloat(item.rate)
+          rate: parseFloat(item.rate),
+          dc_number: isJobWork ? item.dc_number || null : null,
+          dc_date: isJobWork ? item.dc_date || null : null,
+          dia: isJobWork ? item.dia || null : null,
+          rolls: isJobWork && item.rolls !== '' ? parseFloat(item.rolls) : null
         }))
       };
 
@@ -221,10 +234,12 @@ const InvoiceCreate = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" sx={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, mb: 0.5 }}>
-            Create GST Invoice
+            {isJobWork ? 'Create Job Work Invoice' : 'Create GST Invoice'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Select products, compute automatic CGST/SGST/IGST, and compile billing documentation.
+            {isJobWork
+              ? 'Bill processing and job-work charges with challan and job references.'
+              : 'Select products, compute automatic CGST/SGST/IGST, and compile billing documentation.'}
           </Typography>
         </Box>
       </Box>
@@ -250,6 +265,36 @@ const InvoiceCreate = () => {
                     ))}
                   </TextField>
                 </Grid>
+                {isJobWork && (
+                  <>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Customer Challan Number"
+                        fullWidth
+                        value={challanNumber}
+                        onChange={(e) => setChallanNumber(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Job Work Reference"
+                        fullWidth
+                        placeholder="e.g. JW/2026/014"
+                        value={jobWorkReference}
+                        onChange={(e) => setJobWorkReference(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Job Work Description"
+                        fullWidth
+                        placeholder="e.g. Dyeing, embroidery, stitching or processing charges"
+                        value={jobWorkDescription}
+                        onChange={(e) => setJobWorkDescription(e.target.value)}
+                      />
+                    </Grid>
+                  </>
+                )}
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Invoice Number"
@@ -302,7 +347,7 @@ const InvoiceCreate = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Items & Rates</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>{isJobWork ? 'Job Charges' : 'Items & Rates'}</Typography>
                 <Button 
                   variant="outlined" 
                   startIcon={<Add />} 
@@ -317,11 +362,14 @@ const InvoiceCreate = () => {
                 <Table size="small">
                   <TableHead sx={{ bgcolor: '#f8fafc' }}>
                     <TableRow>
-                      <TableCell sx={{ minWidth: 200, fontWeight: 600 }}>Product Name</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>HSN</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Qty</TableCell>
+                      {isJobWork && <TableCell sx={{ fontWeight: 600 }}>DC No.</TableCell>}
+                      {isJobWork && <TableCell sx={{ fontWeight: 600 }}>DC Date</TableCell>}
+                      <TableCell sx={{ minWidth: 160, fontWeight: 600 }}>{isJobWork ? 'Fabric / Work' : 'Product Name'}</TableCell>
+                      {isJobWork ? <TableCell sx={{ fontWeight: 600 }}>Dia</TableCell> : <TableCell sx={{ fontWeight: 600 }}>HSN</TableCell>}
+                      {isJobWork && <TableCell sx={{ fontWeight: 600 }}>Rolls</TableCell>}
+                      <TableCell sx={{ fontWeight: 600 }}>{isJobWork ? 'Weight' : 'Qty'}</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Rate</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>GST %</TableCell>
+                      {!isJobWork && <TableCell sx={{ fontWeight: 600 }}>GST %</TableCell>}
                       <TableCell align="right" sx={{ fontWeight: 600 }}>Amount</TableCell>
                       <TableCell align="center" sx={{ width: 50 }}></TableCell>
                     </TableRow>
@@ -329,6 +377,8 @@ const InvoiceCreate = () => {
                   <TableBody>
                     {items.map((item, idx) => (
                       <TableRow key={idx}>
+                        {isJobWork && <TableCell><TextField size="small" value={item.dc_number} onChange={(e) => handleItemChange(idx, 'dc_number', e.target.value)} sx={{ width: 70 }} /></TableCell>}
+                        {isJobWork && <TableCell><TextField type="date" size="small" value={item.dc_date} onChange={(e) => handleItemChange(idx, 'dc_date', e.target.value)} sx={{ width: 125 }} /></TableCell>}
                         <TableCell>
                           <TextField
                             select
@@ -345,8 +395,9 @@ const InvoiceCreate = () => {
                           </TextField>
                         </TableCell>
                         <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                          {item.hsn || '-'}
+                          {isJobWork ? <TextField size="small" value={item.dia} onChange={(e) => handleItemChange(idx, 'dia', e.target.value)} sx={{ width: 65 }} /> : (item.hsn || '-')}
                         </TableCell>
+                        {isJobWork && <TableCell><TextField type="number" size="small" inputProps={{ min: '0', step: 'any' }} value={item.rolls} onChange={(e) => handleItemChange(idx, 'rolls', e.target.value)} sx={{ width: 65 }} /></TableCell>}
                         <TableCell>
                           <TextField
                             type="number"
@@ -367,9 +418,7 @@ const InvoiceCreate = () => {
                             sx={{ width: 100 }}
                           />
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.85rem' }}>
-                          {item.gst_percentage}%
-                        </TableCell>
+                        {!isJobWork && <TableCell sx={{ fontSize: '0.85rem' }}>{item.gst_percentage}%</TableCell>}
                         <TableCell align="right" sx={{ fontWeight: 500, fontSize: '0.9rem' }}>
                           ₹{item.amount.toFixed(2)}
                         </TableCell>

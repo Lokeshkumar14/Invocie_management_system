@@ -36,6 +36,7 @@ const drawerWidth = 240;
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Create Invoice', icon: <ReceiptIcon />, path: '/invoice/create' },
+  { text: 'Job Work Invoice', icon: <ReceiptIcon />, path: '/invoice/job-work' },
   { text: 'Invoice History', icon: <HistoryIcon />, path: '/invoice/history' },
   { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
   { text: 'Products', icon: <InventoryIcon />, path: '/products' },

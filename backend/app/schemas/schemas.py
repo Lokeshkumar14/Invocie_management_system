@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional
 from datetime import date, datetime
 
@@ -43,6 +43,14 @@ class CustomerBase(BaseModel):
     pincode: Optional[str] = None
     shipping_address: Optional[str] = None
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def blank_email_is_none(cls, value):
+        """Allow optional email fields submitted as empty form strings."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
 class CustomerCreate(CustomerBase):
     pass
 
@@ -58,6 +66,13 @@ class CustomerUpdate(BaseModel):
     state: Optional[str] = None
     pincode: Optional[str] = None
     shipping_address: Optional[str] = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def blank_email_is_none(cls, value):
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
 class CustomerResponse(CustomerBase):
     id: int

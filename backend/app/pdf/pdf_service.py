@@ -396,8 +396,10 @@ def generate_job_work_invoice_pdf(invoice: models.Invoice, company: models.Compa
 
     footer = Table([[
         Paragraph(f"<b>Rupees:</b> {text_or_dash(invoice.amount_words)}", s["small"]),
-        Paragraph(f"For <b>{company_name}</b><br/><br/><br/>",
-                  ParagraphStyle("Signature", parent=s["small"], alignment=1)),
+        Paragraph(
+            f"For <b>{company_name}</b><br/><br/><br/>Authorized Signatory",
+            ParagraphStyle("Signature", parent=s["small"], alignment=1),
+        ),
     ]], colWidths=[350, 187])
     footer.setStyle(TableStyle([
         ("BOX", (0, 0), (-1, -1), 0.7, job_line), ("LINEBEFORE", (1, 0), (1, -1), 0.5, job_line),

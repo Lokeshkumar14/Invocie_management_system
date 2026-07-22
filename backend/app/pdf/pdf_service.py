@@ -608,7 +608,7 @@ def generate_invoice_pdf(invoice: models.Invoice, company: models.CompanyDetails
     sig_right = [
         Paragraph(f"For <b>{company_name}</b>", ParagraphStyle("CenterBold", parent=s["body_bold"], alignment=1)),
         Spacer(1, 40),
-        # Paragraph("Authorized Signatory", ParagraphStyle("CenterText", parent=s["body"], alignment=1)),
+        Paragraph("Authorized Signatory", ParagraphStyle("CenterText", parent=s["body"], alignment=1)),
     ]
     sig_table = Table([[sig_left, sig_right]], colWidths=[300, 240])
     sig_table.setStyle(TableStyle([

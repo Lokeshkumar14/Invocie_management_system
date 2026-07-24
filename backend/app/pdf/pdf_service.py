@@ -266,8 +266,7 @@ def generate_job_work_invoice_pdf(invoice: models.Invoice, company: models.Compa
                   ParagraphStyle("JobCompany", parent=s["bold_small"], fontSize=18, leading=21,
                                  textColor=job_text, alignment=1)),
         Paragraph(text_or_dash(company and company.address) if company else "", ParagraphStyle("JobAddress", parent=s["centre"], fontSize=9.5, leading=12)),
-        Paragraph(f"GST: {text_or_dash(company and company.gst) if company else '-'}   "
-                  f"PAN: {text_or_dash(company and company.pan) if company else '-'}", s["centre"]),
+        Paragraph(f"GST: {text_or_dash(company and company.gst) if company else '-'}", s["centre"]),
     ]
     header_left = (
         Table([[logo, company_block]], colWidths=[80, 305], style=[
@@ -336,7 +335,7 @@ def generate_job_work_invoice_pdf(invoice: models.Invoice, company: models.Compa
     ]))
 
     # --- Items table ---------------------------------------------------------
-    headings = ["S.No", "DC No.", "DC Date", "Fabric", "Dia", "Rolls", "Weight", "Rate", "Amount"]
+    headings = ["S.No", "DC No.", "DC Date", "Fabric", "HSN", "Dia", "Rolls", "Weight", "Rate", "Amount"]
     rows = [[Paragraph(f"<b>{h}</b>", s["centre"]) for h in headings]]
 
     items = list(invoice.items) if invoice.items else []
@@ -347,6 +346,7 @@ def generate_job_work_invoice_pdf(invoice: models.Invoice, company: models.Compa
             Paragraph(text_or_dash(item.dc_number), s["centre"]),
             Paragraph(item.dc_date.strftime("%d/%m/%y") if item.dc_date else "-", s["centre"]),
             Paragraph(product.product_name, s["tiny"]),
+            Paragraph(text_or_dash(product.hsn), s["centre"]),
             Paragraph(text_or_dash(item.dia), s["centre"]),
             Paragraph(f"{item.rolls:g}" if item.rolls is not None else "-", s["right"]),
             Paragraph(qty(item.quantity, 3), s["right"]),
@@ -357,12 +357,12 @@ def generate_job_work_invoice_pdf(invoice: models.Invoice, company: models.Compa
         rows.append([Paragraph("No items added to this invoice.", s["centre"])])
 
     rows.append(
-        [Paragraph("", s["tiny"])] * 6
+        [Paragraph("", s["tiny"])] * 7
         + [Paragraph("<b>TOTAL :</b>", s["right"]), Paragraph("", s["right"]),
            Paragraph(f"<b>{money(invoice.subtotal)}</b>", s["right"])]
     )
 
-    item_table = Table(rows, colWidths=[23, 42, 52, 130, 43, 38, 56, 50, 103], repeatRows=1)
+    item_table = Table(rows, colWidths=[23, 42, 52, 105, 48, 38, 38, 52, 50, 89], repeatRows=1)
     zebra = [("BACKGROUND", (0, r), (-1, r), ZEBRA_ROW) for r in range(1, len(rows) - 1) if r % 2 == 0]
     item_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), job_fill), ("TEXTCOLOR", (0, 0), (-1, 0), job_text),

@@ -116,6 +116,7 @@ class CompanyDetailsBase(BaseModel):
     address: Optional[str] = None
     gst: Optional[str] = None
     pan: Optional[str] = None
+    state: Optional[str] = None
     bank_name: Optional[str] = None
     account_number: Optional[str] = None
     ifsc: Optional[str] = None
@@ -236,3 +237,7 @@ class DashboardStats(BaseModel):
     customers_count: int
     products_count: int
     gst_collected: float
+    paid_count: int = 0
+    unpaid_count: int = 0
+    paid_amount: float = 0.0
+    unpaid_amount: float = 0.0

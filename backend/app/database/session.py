@@ -56,6 +56,13 @@ def add_missing_invoice_columns():
             if name not in existing_item_columns:
                 connection.execute(text(f"ALTER TABLE invoice_items ADD COLUMN {name} {sql_type}"))
 
+    # --- company_details table: add `state` column if missing ----------------
+    if "company_details" in inspector.get_table_names():
+        existing_company_cols = {col["name"] for col in inspector.get_columns("company_details")}
+        if "state" not in existing_company_cols:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE company_details ADD COLUMN state VARCHAR"))
+
 def get_db():
     db = SessionLocal()
     try:

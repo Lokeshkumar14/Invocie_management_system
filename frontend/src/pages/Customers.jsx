@@ -23,7 +23,8 @@ import {
   Grid,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
+  MenuItem
 } from '@mui/material';
 import {
   Add,
@@ -347,14 +348,28 @@ const Customers = () => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  select
                   label="State"
                   fullWidth
-                  placeholder="e.g. Maharashtra, Gujarat"
                   required
+                  defaultValue=""
                   {...register('state', { required: 'State is required for GST calculations' })}
                   error={!!errors.state}
-                  helperText={errors.state?.message || 'Must match your GST tax configurations'}
-                />
+                  helperText={errors.state?.message || 'Must match your company state for CGST/SGST'}
+                >
+                  {[
+                    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+                    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+                    'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+                    'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+                    'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+                    'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+                    'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+                    'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+                  ].map(s => (
+                    <MenuItem key={s} value={s}>{s}</MenuItem>
+                  ))}
+                </TextField>
               </Grid>
               <Grid item xs={12}>
                 <TextField

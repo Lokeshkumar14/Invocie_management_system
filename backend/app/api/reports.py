@@ -52,13 +52,31 @@ def get_dashboard_stats(
     ).scalar()
     gst_collected = gst_query or 0.0
     
+    # Paid / Unpaid breakdown
+    paid_count = db.query(models.Invoice).filter(models.Invoice.status == "paid").count()
+    unpaid_count = db.query(models.Invoice).filter(models.Invoice.status == "unpaid").count()
+    
+    paid_amount_query = db.query(func.sum(models.Invoice.grand_total)).filter(
+        models.Invoice.status == "paid"
+    ).scalar()
+    paid_amount = paid_amount_query or 0.0
+    
+    unpaid_amount_query = db.query(func.sum(models.Invoice.grand_total)).filter(
+        models.Invoice.status == "unpaid"
+    ).scalar()
+    unpaid_amount = unpaid_amount_query or 0.0
+    
     return {
         "today_sales": round(today_sales, 2),
         "monthly_sales": round(monthly_sales, 2),
         "invoices_count": invoices_count,
         "customers_count": customers_count,
         "products_count": products_count,
-        "gst_collected": round(gst_collected, 2)
+        "gst_collected": round(gst_collected, 2),
+        "paid_count": paid_count,
+        "unpaid_count": unpaid_count,
+        "paid_amount": round(paid_amount, 2),
+        "unpaid_amount": round(unpaid_amount, 2)
     }
 
 @router.get("/sales/trend", response_model=List[schemas.DailySales])

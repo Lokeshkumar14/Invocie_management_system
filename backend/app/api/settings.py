@@ -20,6 +20,7 @@ def get_company(
             address="456, GIDC Industrial Estate, Surat, Gujarat - 395006",
             gst="24AAAAA0000A1Z5",
             pan="ABCDE1234F",
+            state="Gujarat",
             bank_name="State Bank of India",
             account_number="30001234567",
             ifsc="SBIN0001234",

@@ -140,10 +140,10 @@ const InvoiceCreate = () => {
     const totalGst = items.reduce((sum, item) => sum + (item.gst_amount || 0), 0);
     
     // GST engine logic comparison
-    const companyState = companyDetails?.state || 'Maharashtra';
-    const customerState = selectedCustomer?.state || '';
+    const companyState = (companyDetails?.state || '').trim().toLowerCase();
+    const customerState = (selectedCustomer?.state || '').trim().toLowerCase();
     
-    const isSameState = companyState.trim().toLowerCase() === customerState.trim().toLowerCase();
+    const isSameState = !!(companyState && customerState && companyState === customerState);
     
     let cgst = 0;
     let sgst = 0;
@@ -169,6 +169,10 @@ const InvoiceCreate = () => {
   };
 
   const totals = calculateTotals();
+
+  const getValidItems = () => {
+    return items.filter(item => item.product_id && item.quantity > 0 && item.rate > 0);
+  };
 
   const handleSaveInvoice = async () => {
     // Validations
@@ -333,11 +337,25 @@ const InvoiceCreate = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    select
                     label="Payment Terms"
                     fullWidth
                     value={paymentTerms}
                     onChange={(e) => setPaymentTerms(e.target.value)}
-                  />
+                  >
+                    {[
+                      'Immediate',
+                      'COD',
+                      'Net 7',
+                      'Net 15',
+                      'Net 30',
+                      'Net 45',
+                      'Net 60',
+                      'Net 90',
+                    ].map(term => (
+                      <MenuItem key={term} value={term}>{term}</MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
               </Grid>
             </CardContent>
@@ -359,13 +377,14 @@ const InvoiceCreate = () => {
               </Box>
 
               <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #f1f5f9', maxWidth: '100%' }}>
-                <Table size="small" sx={{ minWidth: isJobWork ? 900 : 760 }} aria-label="Invoice items. Scroll sideways on small screens to see all columns.">
+                <Table size="small" sx={{ minWidth: isJobWork ? 980 : 760 }} aria-label="Invoice items. Scroll sideways on small screens to see all columns.">
                   <TableHead sx={{ bgcolor: '#f8fafc' }}>
                     <TableRow>
                       {isJobWork && <TableCell sx={{ fontWeight: 600 }}>DC No.</TableCell>}
                       {isJobWork && <TableCell sx={{ fontWeight: 600 }}>DC Date</TableCell>}
                       <TableCell sx={{ minWidth: 160, fontWeight: 600 }}>{isJobWork ? 'Fabric / Work' : 'Product Name'}</TableCell>
-                      {isJobWork ? <TableCell sx={{ fontWeight: 600 }}>Dia</TableCell> : <TableCell sx={{ fontWeight: 600 }}>HSN</TableCell>}
+                      <TableCell sx={{ fontWeight: 600 }}>HSN</TableCell>
+                      {isJobWork && <TableCell sx={{ fontWeight: 600 }}>Dia</TableCell>}
                       {isJobWork && <TableCell sx={{ fontWeight: 600 }}>Rolls</TableCell>}
                       <TableCell sx={{ fontWeight: 600 }}>{isJobWork ? 'Weight' : 'Qty'}</TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>Rate</TableCell>
@@ -395,8 +414,9 @@ const InvoiceCreate = () => {
                           </TextField>
                         </TableCell>
                         <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                          {isJobWork ? <TextField size="small" value={item.dia} onChange={(e) => handleItemChange(idx, 'dia', e.target.value)} sx={{ width: 65 }} /> : (item.hsn || '-')}
+                          {item.hsn || '-'}
                         </TableCell>
+                        {isJobWork && <TableCell><TextField size="small" value={item.dia} onChange={(e) => handleItemChange(idx, 'dia', e.target.value)} sx={{ width: 65 }} /></TableCell>}
                         {isJobWork && <TableCell><TextField type="number" size="small" inputProps={{ min: '0', step: 'any' }} value={item.rolls} onChange={(e) => handleItemChange(idx, 'rolls', e.target.value)} sx={{ width: 65 }} /></TableCell>}
                         <TableCell>
                           <TextField

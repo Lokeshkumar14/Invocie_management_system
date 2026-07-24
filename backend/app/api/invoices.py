@@ -1,4 +1,3 @@
-import os
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import Response
@@ -24,6 +23,7 @@ def get_company_details(db: Session) -> models.CompanyDetails:
             address="456, GIDC Industrial Estate, Surat, Gujarat - 395006",
             gst="24AAAAA0000A1Z5",
             pan="ABCDE1234F",
+            state="Gujarat",
             bank_name="State Bank of India",
             account_number="30001234567",
             ifsc="SBIN0001234",
@@ -72,14 +72,10 @@ def create_invoice(
     # 2. Fetch Company Details to compare states
     company = get_company_details(db)
     
-    # Clean and compare states
-    company_state = (company.address or "Maharashtra").split(",")[-1].strip().lower()
-    # Or split by pin, or parse state from field directly if we add one.
-    # To make this robust, let's look at DEFAULT_COMPANY_STATE env or standard state field
-    company_state_configured = os.getenv("DEFAULT_COMPANY_STATE", "Maharashtra").strip().lower()
-    
+    # Compare states to determine intrastate (CGST+SGST) vs interstate (IGST)
+    company_state = (company.state or "").strip().lower()
     customer_state = (customer.state or "").strip().lower()
-    is_same_state = (customer_state == company_state_configured)
+    is_same_state = bool(company_state and customer_state and company_state == customer_state)
     
     # 3. Handle Auto Invoice Number
     invoice_num = invoice_data.invoice_number
@@ -203,6 +199,26 @@ def delete_invoice(
     db.delete(invoice)
     db.commit()
     return {"detail": "Invoice deleted successfully"}
+
+@router.patch("/{invoice_id}/status", response_model=schemas.InvoiceResponse)
+def update_invoice_status(
+    invoice_id: int,
+    status_data: dict,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(security.get_current_user)
+):
+    invoice = db.query(models.Invoice).filter(models.Invoice.id == invoice_id).first()
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    new_status = status_data.get("status", "").lower()
+    if new_status not in {"paid", "unpaid", "cancelled"}:
+        raise HTTPException(status_code=422, detail="Status must be paid, unpaid, or cancelled")
+    
+    invoice.status = new_status
+    db.commit()
+    db.refresh(invoice)
+    return invoice
 
 @router.get(
     "/{invoice_id}/pdf",

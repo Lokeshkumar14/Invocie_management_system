@@ -16,7 +16,9 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
-  Tooltip
+  Tooltip,
+  MenuItem,
+  Select
 } from '@mui/material';
 import {
   Download,
@@ -102,6 +104,34 @@ const InvoiceHistory = () => {
     }
   };
 
+  const handleStatusChange = async (invoiceId, newStatus) => {
+    try {
+      await api.patch(`/invoice/${invoiceId}/status`, { status: newStatus });
+      setInvoices(prev =>
+        prev.map(inv =>
+          inv.id === invoiceId ? { ...inv, status: newStatus } : inv
+        )
+      );
+      showToast(`Payment status updated to ${newStatus.toUpperCase()}`);
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to update payment status', 'error');
+    }
+  };
+
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case 'paid':
+        return { bgcolor: '#e6f4ea', color: '#137333', borderColor: '#a8dab5' };
+      case 'unpaid':
+        return { bgcolor: '#fef3c7', color: '#b25e00', borderColor: '#fcd34d' };
+      case 'cancelled':
+        return { bgcolor: '#fde8e8', color: '#c62828', borderColor: '#f5c6cb' };
+      default:
+        return { bgcolor: '#f1f5f9', color: '#475569', borderColor: '#cbd5e1' };
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mb: { xs: 2.5, sm: 4 } }}>
@@ -121,7 +151,7 @@ const InvoiceHistory = () => {
         </Box>
       ) : (
         <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
-          <Table sx={{ minWidth: 650 }}>
+          <Table sx={{ minWidth: 750 }}>
             <TableHead sx={{ bgcolor: '#f8fafc' }}>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600 }}>Invoice No</TableCell>
@@ -131,7 +161,7 @@ const InvoiceHistory = () => {
                 <TableCell align="right" sx={{ fontWeight: 600 }}>Subtotal (INR)</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>GST (INR)</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>Grand Total (INR)</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Payment Status</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -145,6 +175,7 @@ const InvoiceHistory = () => {
               ) : (
                 invoices.map((inv) => {
                   const totalGst = inv.cgst + inv.sgst + inv.igst;
+                  const statusStyles = getStatusStyles(inv.status);
                   return (
                     <TableRow key={inv.id} hover>
                       <TableCell sx={{ fontWeight: 600 }}>{inv.invoice_number}</TableCell>
@@ -163,20 +194,42 @@ const InvoiceHistory = () => {
                         ₹{inv.grand_total.toFixed(2)}
                       </TableCell>
                       <TableCell>
-                        <Box
+                        <Select
+                          value={inv.status || 'unpaid'}
+                          onChange={(e) => handleStatusChange(inv.id, e.target.value)}
+                          size="small"
                           sx={{
-                            display: 'inline-block',
-                            px: 1,
-                            py: 0.25,
-                            borderRadius: 1.5,
-                            fontSize: '0.75rem',
+                            minWidth: 110,
                             fontWeight: 600,
-                            bgcolor: inv.status === 'paid' ? '#e6f4ea' : '#fef3c7',
-                            color: inv.status === 'paid' ? '#137333' : '#b25e00',
+                            fontSize: '0.8rem',
+                            bgcolor: statusStyles.bgcolor,
+                            color: statusStyles.color,
+                            border: `1px solid ${statusStyles.borderColor}`,
+                            borderRadius: 2,
+                            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                            '& .MuiSelect-icon': { color: statusStyles.color },
+                            '&:hover': { bgcolor: statusStyles.bgcolor, opacity: 0.9 },
                           }}
                         >
-                          {inv.status?.toUpperCase()}
-                        </Box>
+                          <MenuItem value="paid">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#137333' }} />
+                              PAID
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="unpaid">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#b25e00' }} />
+                              UNPAID
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="cancelled">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#c62828' }} />
+                              CANCELLED
+                            </Box>
+                          </MenuItem>
+                        </Select>
                       </TableCell>
                       <TableCell align="right">
                         <Tooltip title="Download PDF">

@@ -77,12 +77,14 @@ const Dashboard = () => {
   }
 
   const statCards = [
-    { title: "Today's Sales", value: `₹${stats?.today_sales}`, icon: <TrendingUp fontSize="large" />, color: '#3b82f6' },
-    { title: "Monthly Sales", value: `₹${stats?.monthly_sales}`, icon: <RequestQuote fontSize="large" />, color: '#10b981' },
-    { title: "GST Collected", value: `₹${stats?.gst_collected}`, icon: <RequestQuote fontSize="large" />, color: '#f59e0b' },
+    { title: "Today's Sales", value: `₹${stats?.today_sales?.toLocaleString('en-IN')}`, icon: <TrendingUp fontSize="large" />, color: '#3b82f6' },
+    { title: "Monthly Sales", value: `₹${stats?.monthly_sales?.toLocaleString('en-IN')}`, icon: <RequestQuote fontSize="large" />, color: '#10b981' },
+    { title: "Paid Amount", value: `₹${stats?.paid_amount?.toLocaleString('en-IN')}`, subtitle: `${stats?.paid_count} invoices`, icon: <Receipt fontSize="large" />, color: '#16a34a' },
+    { title: "Unpaid Amount", value: `₹${stats?.unpaid_amount?.toLocaleString('en-IN')}`, subtitle: `${stats?.unpaid_count} invoices`, icon: <Receipt fontSize="large" />, color: '#dc2626' },
     { title: "Total Invoices", value: stats?.invoices_count, icon: <Receipt fontSize="large" />, color: '#8b5cf6' },
     { title: "Active Customers", value: stats?.customers_count, icon: <People fontSize="large" />, color: '#ec4899' },
-    { title: "Products Catalog", value: stats?.products_count, icon: <Inventory fontSize="large" />, color: '#06b6d4' }
+    { title: "Products Catalog", value: stats?.products_count, icon: <Inventory fontSize="large" />, color: '#06b6d4' },
+    { title: "GST Collected", value: `₹${stats?.gst_collected?.toLocaleString('en-IN')}`, icon: <RequestQuote fontSize="large" />, color: '#f59e0b' },
   ];
 
   return (
@@ -110,7 +112,7 @@ const Dashboard = () => {
       {/* Stats Cards Grid */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {statCards.map((card, idx) => (
-          <Grid item xs={12} sm={6} md={4} key={idx}>
+          <Grid item xs={12} sm={6} md={3} key={idx}>
             <Card sx={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 3 }}>
                 <Box 
@@ -133,6 +135,11 @@ const Dashboard = () => {
                   <Typography variant="h5" sx={{ fontWeight: 700, fontFamily: '"Outfit", sans-serif', mt: 0.5 }}>
                     {card.value}
                   </Typography>
+                  {card.subtitle && (
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {card.subtitle}
+                    </Typography>
+                  )}
                 </Box>
               </CardContent>
             </Card>

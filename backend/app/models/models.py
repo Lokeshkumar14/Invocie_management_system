@@ -53,6 +53,7 @@ class CompanyDetails(Base):
     address = Column(Text)
     gst = Column(String)
     pan = Column(String)
+    state = Column(String)  # Company's state for GST (CGST/SGST vs IGST)
     bank_name = Column(String)
     account_number = Column(String)
     ifsc = Column(String)
